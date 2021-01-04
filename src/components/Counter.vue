@@ -1,12 +1,11 @@
 <template>
   <div>
     <h1>Counter</h1>
-    <p>Days : {{ days }}</p>
-    <p>Hours : {{ hours }}</p>
-    <p>Minutes :  {{ minutes }}</p>
-    <p>Seconds : {{ seconds }}</p>
-{{this.hoursInMs}}
-    {{this.daysInMs}}
+    <p>Days : {{  displayDays }}</p>
+    <p>Hours : {{  displayHours }}</p>
+    <p>Minutes : {{ displayMinutes }}</p>
+    <p>Seconds : {{ displaySeconds }}</p>
+
   </div>
 </template>
 
@@ -15,46 +14,73 @@ export default {
   name: 'Counter',
   data: function () {
     return {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      endDate:1609779600000,
+      displayDays: 0,
+      displayHours: 0,
+      displayMinutes: 0,
+      displaySeconds: 0,
     }
   },
   computed: {
-    secondsInMs: function () {
-      return 1000
+    _seconds: () => 1000,
+    _minutes() {
+      return this._seconds * 60
     },
-    minutesInMs: function () {
-      return 60 * 1000
+    _hours() {
+      return this._minutes * 60
     },
-    hoursInMs: function () {
-      return 60 * 60 * 1000
+    _days() {
+      return this._hours * 24
     },
-    daysInMs: function () {
-      return 24 * 60 * 60 * 1000
-    },
+  },
+  mounted () {
+    this.showRemaining();
   },
   methods: {
     showRemaining() {
-      var currentDate=new Date();
-      var diff= Math.abs(this.endDate-currentDate);
+      const time = setInterval(function () {
 
-      //days
-      this.days= Math.floor(diff/this.daysInMs);
-      diff-=this.days*this.daysInMs;
+        const now= new Date();
+        const end= new Date(2021, 1, 8, 17,0);
 
-      //hours
-      this.hours=Math.floor(diff / this.hoursInMs)%24 ;
-      diff-=this.hours*this.hoursInMs
+        //var currentDate = new Date();
+        //var endDate = 1609779600000;
+        //var diff = Math.abs(endDate - currentDate);
 
-      //minutes
-      this.minutes=Math.floor(diff/this.minutesInMs)%60;
-      diff-=this.minutes*this.minutesInMs;
+        const distance=end-now;
 
-      //seconds
-      this.seconds=Math.floor(diff/this.secondsInMs)%60;
+        if(distance<0){
+          clearInterval(time);
+        }
+
+        const days = Math.floor(distance / this._days);
+        const hours = Math.floor((distance % this._days) / this._hours);
+        const minutes = Math.floor((distance % this._hours) / this._minutes);
+        const seconds = Math.floor((distance % this._minutes) / this._seconds);
+
+        this.displayDays =days;
+        this.displayHours = hours;
+        this.displayMinutes = minutes;
+        this.displaySeconds = seconds;
+
+        //days
+        //this.days = Math.floor(diff / this.daysInMs);
+        //console.log(this.daysInMs);
+        //diff -= this.days * this.daysInMs;
+
+
+        //hours
+        //this.hours = Math.floor(diff / this.hoursInMs) % 24;
+        //diff -= this.hours * this.hoursInMs
+
+        //minutes
+        //this.minutes = Math.floor(diff / this.minutesInMs) % 60;
+        //console.log(secondsInMs);
+        //diff -= this.minutes * this.minutesInMs;
+
+        //seconds
+        //this.seconds = Math.floor(diff / this.secondsInMs) % 60;
+      }, 1000);
+
     }
 
   }
